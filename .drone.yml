@@ -27,9 +27,8 @@ steps:
       - name: output
         path: /var/shared
     commands:
-      - ls /var/shared
       - rm -rf /var/shared/*
-      - cp -r build/* /var/shared
+      - cp -r dist/* /var/shared
 
 volumes:
   - name: output
@@ -37,6 +36,6 @@ volumes:
       path: /root/services/shared/cubify-cuber
 ---
 kind: signature
-hmac: fcc4f607d633cd72523d179e088872082940f0e11ac7d429b4d6df24c839c1e0
+hmac: c6d44de6a782af19e758d121abd3a0144132667a95819f05470066fa523890f8
 
 ...
