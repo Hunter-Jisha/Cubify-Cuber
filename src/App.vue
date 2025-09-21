@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import * as THREE from 'three'
 import SimpleCamera from 'simple-vue-camera'
+import { IconRepeat } from '@tabler/icons-vue'
 
 const taken = ref(false)
 
@@ -79,6 +80,18 @@ async function shoot() {
 
   taken.value = true
 }
+
+let currentCameraIndex = 0
+
+async function switchCameras() {
+  const devices = await actualCamera.value?.devices(["videoinput"]);
+  if(!devices) {
+    return
+  }
+  currentCameraIndex++
+
+  actualCamera.value?.changeCamera(devices[currentCameraIndex % (devices.length ?? 0)].deviceId);
+}
 </script>
 
 <template>
@@ -88,6 +101,11 @@ async function shoot() {
       <img class="absolute inset-1/2 -translate-1/2" alt="face" src="/face.webp" />
       <button @click="shoot"
         class="bg-white border-gray-200 border-8 size-24 absolute left-1/2 bottom-4 rounded-full -translate-x-1/2" />
+
+        <button @click="switchCameras"
+        class="bg-white p-4 rounded-full text-black absolute right-4 bottom-4 size-16" >
+          <IconRepeat class="size-full"/>
+      </button>
     </div>
 
     <div :class="taken ? 'flex' : 'hidden'" class="size-full bg-black relative">
