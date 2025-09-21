@@ -12,12 +12,12 @@ trigger:
 
 steps:
   - name: install
-    image: node:18
+    image: node:22
     commands:
       - npm ci
 
   - name: build
-    image: node:18
+    image: node:22
     commands:
       - npm run build
 
@@ -37,6 +37,6 @@ volumes:
       path: /root/services/shared/cubify-cuber
 ---
 kind: signature
-hmac: 55d66ed804b2482003630ac119c7212150b5f1f07895d36cc56b0a916ebbee68
+hmac: fcc4f607d633cd72523d179e088872082940f0e11ac7d429b4d6df24c839c1e0
 
 ...
