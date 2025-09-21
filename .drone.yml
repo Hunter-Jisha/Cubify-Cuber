@@ -1,0 +1,42 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+    - custom
+
+steps:
+  - name: install
+    image: node:18
+    commands:
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: deploy
+    image: alpine
+    volumes:
+      - name: output
+        path: /var/shared
+    commands:
+      - ls /var/shared
+      - rm -rf /var/shared/*
+      - cp -r build/* /var/shared
+
+volumes:
+  - name: output
+    host:
+      path: /root/services/shared/cubify-cuber
+---
+kind: signature
+hmac: 3ae6256275637a15a2c2deecc62117bbf59ac1dc7c147ed9e3dea2c8760b47cc
+
+...
