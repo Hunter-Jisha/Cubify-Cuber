@@ -2,12 +2,12 @@
 import { ref, onMounted, watch } from 'vue'
 import * as THREE from 'three'
 import SimpleCamera from 'simple-vue-camera'
-import { IconRepeat } from '@tabler/icons-vue'
+import { IconRepeat, IconView360Arrow } from '@tabler/icons-vue'
 
 const taken = ref(false)
 
 watch(taken, () => {
-  if(taken.value) {
+  if (taken.value) {
     renderer.setAnimationLoop(() => {
       renderer.setSize(canvas.value?.clientWidth ?? 512, canvas.value?.clientWidth ?? 512)
       renderer.render(scene, camera)
@@ -15,8 +15,8 @@ watch(taken, () => {
   }
 })
 
-const actualCamera = ref < InstanceType < typeof SimpleCamera >> ()
-const canvas = ref <HTMLCanvasElement> ()
+const actualCamera = ref<InstanceType<typeof SimpleCamera>>()
+const canvas = ref<HTMLCanvasElement>()
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
@@ -85,13 +85,30 @@ let currentCameraIndex = 0
 
 async function switchCameras() {
   const devices = await actualCamera.value?.devices(["videoinput"]);
-  if(!devices) {
+  if (!devices) {
     return
   }
   currentCameraIndex++
 
   actualCamera.value?.changeCamera(devices[currentCameraIndex % (devices.length ?? 0)].deviceId);
 }
+
+const spinning = ref(false)
+
+let spinningAnimationIntervalRef: number | undefined
+
+watch(spinning, () => {
+  if (spinning.value) {
+    spinningAnimationIntervalRef = setInterval(() => {
+      cube.rotateY(0.001)
+      renderer.render(scene, camera)
+    }, 10)
+  }
+  else {
+    clearInterval(spinningAnimationIntervalRef)
+    cube.rotation.set(0.6, -0.75, 0)
+  }
+})
 </script>
 
 <template>
@@ -102,15 +119,18 @@ async function switchCameras() {
       <button @click="shoot"
         class="bg-white border-gray-200 border-8 size-24 absolute left-1/2 bottom-4 rounded-full -translate-x-1/2" />
 
-        <button @click="switchCameras"
-        class="bg-white p-4 rounded-full text-black absolute right-4 bottom-4 size-16" >
-          <IconRepeat class="size-full"/>
+      <button @click="switchCameras" class="bg-white p-4 rounded-full text-black absolute right-4 bottom-4 size-16">
+        <IconRepeat class="size-full" />
       </button>
     </div>
 
     <div :class="taken ? 'flex' : 'hidden'" class="size-full bg-black relative">
       <div class="size-full absolute inset-0 flex items-center justify-center" ref="canvas" />
-      <button @click="taken = false" class="px-4 py-2 bg-white font-bold text-black text-lg absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full">Retake</button>
+      <button @click="taken = false"
+        class="px-4 py-2 bg-white font-bold text-black text-lg absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full">Retake</button>
+      <button @click="spinning = !spinning" class="bg-white p-4 rounded-full text-black absolute right-4 bottom-4 size-16">
+        <IconView360Arrow class="size-full" />
+      </button>
     </div>
   </div>
 </template>
