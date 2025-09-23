@@ -100,7 +100,7 @@ let spinningAnimationIntervalRef: number | undefined
 watch(spinning, () => {
   if (spinning.value) {
     spinningAnimationIntervalRef = setInterval(() => {
-      cube.rotateY(0.001)
+      cube.rotateY(0.003)
       renderer.render(scene, camera)
     }, 10)
   }
