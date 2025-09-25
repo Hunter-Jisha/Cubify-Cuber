@@ -93,26 +93,39 @@ async function switchCameras() {
   actualCamera.value?.changeCamera(devices[currentCameraIndex % (devices.length ?? 0)].deviceId);
 }
 
-const spinning = ref(false)
+const spinning = ref(0)
+const containerRotation = ref(0)
 
 let spinningAnimationIntervalRef: number | undefined
+let containerSpinningAnimationIntervalRef: number | undefined
+
 
 watch(spinning, () => {
-  if (spinning.value) {
+  if (spinning.value == 1) {
     spinningAnimationIntervalRef = setInterval(() => {
       cube.rotateY(0.003)
       renderer.render(scene, camera)
     }, 10)
   }
-  else {
+  else if(spinning.value == 2) {
+     containerSpinningAnimationIntervalRef = setInterval(() => {
+      containerRotation.value += 1;
+    }, 10)
+  }
+  else{
     clearInterval(spinningAnimationIntervalRef)
     cube.rotation.set(0.6, -0.75, 0)
+
+    clearInterval(containerSpinningAnimationIntervalRef)
+    containerRotation.value = 0
+
+    spinning.value = 0
   }
 })
 </script>
 
 <template>
-  <div class="w-screen h-dvh">
+  <div class="w-screen h-dvh" :style="`transform: rotateY(${containerRotation}deg);`">
     <div :class="taken ? 'hidden' : 'flex'" class="size-full bg-black relative">
       <SimpleCamera :resolution="{ width: 512, height: 512 }" ref="actualCamera" autoplay />
       <img class="absolute inset-1/2 -translate-1/2" alt="face" src="/face.webp" />
@@ -128,7 +141,7 @@ watch(spinning, () => {
       <div class="size-full absolute inset-0 flex items-center justify-center" ref="canvas" />
       <button @click="taken = false"
         class="px-4 py-2 bg-white font-bold text-black text-lg absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full">Retake</button>
-      <button @click="spinning = !spinning" class="bg-white p-4 rounded-full text-black absolute right-4 bottom-4 size-16">
+      <button @click="spinning++" class="bg-white p-4 rounded-full text-black absolute right-4 bottom-4 size-16">
         <IconView360Arrow class="size-full" />
       </button>
     </div>
