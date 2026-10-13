@@ -164,6 +164,14 @@ function download() {
   renderer.setSize(size.x, size.y)
   cube.rotation.y = rotationY
 
+  // Phones ignore download links, so use the share sheet; decoding synchronously keeps the tap that Safari requires
+  const bytes = Uint8Array.from(atob(url.split(',')[1]), char => char.charCodeAt(0))
+  const file = new File([bytes], 'cube.png', { type: 'image/png' })
+  if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({ files: [file] })) {
+    navigator.share({ files: [file] })
+    return
+  }
+
   const link = document.createElement('a')
   link.href = url
   link.download = 'cube.png'
